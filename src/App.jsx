@@ -234,13 +234,9 @@ function App() {
         <option value="british">British</option>
         <option value="french">French</option>
         <option value="korean">Korean</option>
-        <option value="korean">Chinese</option>
-        <option value="korean">Japanese</option>
-        <option value="korean">Italian</option>
-        <option value="korean">Indonesian</option>
-        <option value="korean">Vietnamese</option>
-        <option value="korean">Spanish</option>
-        <option value="korean">Other</option>
+        <option value="spanish">Spanish</option>
+        <option value="other">Other</option>
+
       </select>
 
       <AgGridReact
