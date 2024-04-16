@@ -205,6 +205,17 @@ function App() {
         return <b>{rating.toFixed(2)}</b>;
       },
     },
+    { field: "Score.Likes", headerName: "Total number of likes" },
+
+    {
+      field: "NumScore",
+      cellRenderer: ({ data }) => {
+        const totalVotes = data.Score.Likes + data.Score.Dislikes;
+
+        return <b>{totalVotes}</b>;
+      },
+    },
+
   ]);
 
   // Container: Defines the grid's theme & dimensions.
@@ -223,6 +234,13 @@ function App() {
         <option value="british">British</option>
         <option value="french">French</option>
         <option value="korean">Korean</option>
+        <option value="korean">Chinese</option>
+        <option value="korean">Japanese</option>
+        <option value="korean">Italian</option>
+        <option value="korean">Indonesian</option>
+        <option value="korean">Vietnamese</option>
+        <option value="korean">Spanish</option>
+        <option value="korean">Other</option>
       </select>
 
       <AgGridReact
