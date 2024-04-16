@@ -228,16 +228,15 @@ function App() {
         name="typeoffood"
         id="typeoffood"
         onChange={handlePickTypeOfFood}
-        value={typeOfFood}
-      >
+        value={typeOfFood}>
         <option value=""></option>
         <option value="british">British</option>
         <option value="french">French</option>
         <option value="korean">Korean</option>
         <option value="spanish">Spanish</option>
         <option value="other">Other</option>
-
       </select>
+
 
       <AgGridReact
         rowData={
