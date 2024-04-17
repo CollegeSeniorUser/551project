@@ -98,56 +98,85 @@ function App() {
   // This function is called whenever a user clicks on a checkbox
   // It updates the data in the database and in the local storage
   // It also updates the state of the userData (Which is really just a helper along with the local storage)
-  const onEdit = (rowData, property) => (e) => {
-    // Update realtime DB
+const onEdit = (rowData, property) => async (e) => {
+  // Determine the database based on rowData
+  const db = rowData.db === "db1" ? db1 : db2;
 
-    const db = rowData.db === "db1" ? db1 : db2;
-    if (property === "like") {
-      const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
+  let updateNumScore = false; // Flag to determine if numScore needs to be updated
 
-      runTransaction(likesRef, (currentLikes) => {
-        // if currentLikes has never been set, currentLikes will be `null`.
-        return (currentLikes || 0) + (e.target.checked ? 1 : -1);
-      });
+  // Handling likes
+  if (property === "like") {
+    const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
 
-      console.log("id", "like-" + rowData.id);
-      if (e.target.checked && rowData.userData?.dislike) {
-        const likesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
-
-        runTransaction(likesRef, (currentDislikes) => {
-          // if currentLikes has never been set, currentLikes will be `null`.
-          return (currentDislikes || 0) - 1;
-        });
-      }
-    }
-
-    if (property === "dislike") {
-      const likesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
-
-      runTransaction(likesRef, (currentDisikes) => {
-        // if currentLikes has never been set, currentLikes will be `null`.
-        return (currentDisikes || 0) + (e.target.checked ? 1 : -1);
-      });
-
-      if (e.target.checked && rowData.userData?.like) {
-        const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
-
-        runTransaction(likesRef, (currentLikes) => {
-          // if currentLikes has never been set, currentLikes will be `null`.
-          return (currentLikes || 0) - 1;
-        });
-      }
-    }
-
-    saveToLocalStorage("data", {
-      [rowData.id]: { [property]: e.target.checked },
+    // Updating likes
+    await runTransaction(likesRef, (currentLikes) => {
+      return (currentLikes || 0) + (e.target.checked ? 1 : -1);
     });
 
-    setUserData((prev) => ({
-      ...prev,
-      [rowData.id]: { [property]: e.target.checked },
-    }));
-  };
+    if (e.target.checked && rowData.userData?.dislike) {
+      const dislikesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
+
+      // Updating dislikes if user changes from dislike to like
+      await runTransaction(dislikesRef, (currentDislikes) => {
+        return (currentDislikes || 0) - 1;
+      });
+
+      updateNumScore = true; // Need to update numScore due to change in likes/dislikes
+    }
+  }
+
+  // Handling dislikes
+  if (property === "dislike") {
+    const dislikesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
+
+    // Updating dislikes
+    await runTransaction(dislikesRef, (currentDisikes) => {
+      return (currentDisikes || 0) + (e.target.checked ? 1 : -1);
+    });
+
+    if (e.target.checked && rowData.userData?.like) {
+      const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
+
+      // Updating likes if user changes from like to dislike
+      await runTransaction(likesRef, (currentLikes) => {
+        return (currentLikes || 0) - 1;
+      });
+
+      updateNumScore = true; // Need to update numScore due to change in likes/dislikes
+    }
+  }
+
+  // Updating numScore in Firebase based on the latest likes and dislikes
+  if (updateNumScore) {
+    // Define references for likes and dislikes
+    const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
+    const dislikesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
+
+    // Fetching current likes and dislikes
+    const likesSnap = await get(likesRef);
+    const dislikesSnap = await get(dislikesRef);
+    const likes = likesSnap.val() || 0;
+    const dislikes = dislikesSnap.val() || 0;
+
+    // Calculating new numScore
+    const numScore = likes - dislikes;
+
+    // Updating numScore in Firebase
+    const numScoreRef = ref(db, `restaurants/${rowData.id}/Score/NumScore`);
+    set(numScoreRef, numScore);
+  }
+
+  // Updating local storage and state
+  saveToLocalStorage("data", {
+    [rowData.id]: { [property]: e.target.checked },
+  });
+
+  setUserData((prev) => ({
+    ...prev,
+    [rowData.id]: { [property]: e.target.checked },
+  }));
+};
+
 
   // Column Definitions: Defines & controls grid columns.
   const [colDefs] = useState([
@@ -208,10 +237,9 @@ function App() {
     { field: "Score.Likes", headerName: "Total number of likes" },
 
     {
-      field: "NumScore",
+      field: "Num of score",
       cellRenderer: ({ data }) => {
         const totalVotes = data.Score.Likes + data.Score.Dislikes;
-
         return <b>{totalVotes}</b>;
       },
     },
@@ -236,7 +264,7 @@ function App() {
         <option value="spanish">Spanish</option>
         <option value="other">Other</option>
       </select>
-
+ 
 
       <AgGridReact
         rowData={
