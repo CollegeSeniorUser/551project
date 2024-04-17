@@ -218,7 +218,7 @@ function App() {
         return <b>{rating.toFixed(2)}</b>;
       },
     },
-    { field: "Stars", filter: true },
+    { field: "Score.Stars", filter: true },
   ]);
 
   // Container: Defines the grid's theme & dimensions.
