@@ -206,7 +206,7 @@ function App() {
       ),
     },
     {
-      field: "Rating",
+      field: "Stars",
       cellRenderer: ({ data }) => {
         const totalVotes = data.Score.Likes + data.Score.Dislikes;
 
