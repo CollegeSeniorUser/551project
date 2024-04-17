@@ -219,7 +219,7 @@ function App() {
       },
     },
     { field: "Score.Num of score", headerName: 'Total votes', filter: true },
-    { field: "Score.Stars", headerName: 'Stars', filter: true },
+    //{ field: "Score.Stars", headerName: 'Stars', filter: true },
   ]);
 
   // Container: Defines the grid's theme & dimensions.
