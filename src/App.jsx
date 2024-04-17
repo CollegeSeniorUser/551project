@@ -105,7 +105,7 @@ function App() {
     const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
     const dislikesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
     const numOfScore = ref(db, `restaurants/${rowData.id}/Score/Num of score`);
-    const starsRef = ref(db, `restaurants/${rowData.id}/Score/Stars`);
+
     if (property === "like") {
       // Get the number of likes using likesRef
 
@@ -150,15 +150,15 @@ function App() {
     runTransaction(numOfScore, (currentNumOfScore) => {
       return currentLikes + currentdisLikes;
     });
-        // Calculate stars
-    const rating = totalVotes === 0 ? 0 : (currentLikes / totalVotes) * 5;
 
-    // Update stars
-    runTransaction(starsRef, () => rating);
+    saveToLocalStorage("data", {
+      [rowData.id]: { [property]: e.target.checked },
+    });
 
-// Update local storage and userData state
-  saveToLocalStorage("data", { ...userData, [rowData.id]: { [property]: e.target.checked } });
-  setUserData((prev) => ({ ...prev, [rowData.id]: { [property]: e.target.checked } }));
+    setUserData((prev) => ({
+      ...prev,
+      [rowData.id]: { [property]: e.target.checked },
+    }));
   };
 
   // Column Definitions: Defines & controls grid columns.
@@ -205,7 +205,6 @@ function App() {
         </div>
       ),
     },
-    /***
     {
       field: "Stars",
       cellRenderer: ({ data }) => {
@@ -218,10 +217,9 @@ function App() {
         const rating = (data.Score.Likes / totalVotes) * 5;
         return <b>{rating.toFixed(2)}</b>;
       },
-    },***/
-
+    },
     { field: "Score.Num of score", headerName: 'Total votes', filter: true },
-    { field: "Score.Stars", headerName: 'Stars', filter: true },
+    //{ field: "Score.Stars", headerName: 'Stars', filter: true },
   ]);
 
   // Container: Defines the grid's theme & dimensions.
