@@ -6,6 +6,7 @@ import {
   runTransaction,
   orderByChild,
   equalTo,
+  get,
 } from "firebase/database";
 import { AgGridReact } from "@ag-grid-community/react";
 import "@ag-grid-community/styles/ag-grid.css";
@@ -98,12 +99,15 @@ function App() {
   // This function is called whenever a user clicks on a checkbox
   // It updates the data in the database and in the local storage
   // It also updates the state of the userData (Which is really just a helper along with the local storage)
-  const onEdit = (rowData, property) => (e) => {
-    // Update realtime DB
-
+  const onEdit = (rowData, property) => async (e) => {
     const db = rowData.db === "db1" ? db1 : db2;
+    // Update realtime DB
+    const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
+    const dislikesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
+    const numOfScore = ref(db, `restaurants/${rowData.id}/Score/Num of score`);
+
     if (property === "like") {
-      const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
+      // Get the number of likes using likesRef
 
       runTransaction(likesRef, (currentLikes) => {
         // if currentLikes has never been set, currentLikes will be `null`.
@@ -122,9 +126,7 @@ function App() {
     }
 
     if (property === "dislike") {
-      const likesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
-
-      runTransaction(likesRef, (currentDisikes) => {
+      runTransaction(dislikesRef, (currentDisikes) => {
         // if currentLikes has never been set, currentLikes will be `null`.
         return (currentDisikes || 0) + (e.target.checked ? 1 : -1);
       });
@@ -138,6 +140,16 @@ function App() {
         });
       }
     }
+
+    const snapshotLikes = await get(likesRef);
+    const snapshotdisLikes = await get(dislikesRef);
+    const currentLikes = snapshotLikes.val() || 0;
+    const currentdisLikes = snapshotdisLikes.val() || 0;
+    debugger;
+
+    runTransaction(numOfScore, (currentNumOfScore) => {
+      return currentLikes + currentdisLikes;
+    });
 
     saveToLocalStorage("data", {
       [rowData.id]: { [property]: e.target.checked },
@@ -205,16 +217,6 @@ function App() {
         return <b>{rating.toFixed(2)}</b>;
       },
     },
-    { field: "Score.Likes", headerName: "Total number of likes" },
-
-    {
-      field: "Num of score",
-      cellRenderer: ({ data }) => {
-        const totalVotes = data.Score.Likes + data.Score.Dislikes;
-        return <b>{totalVotes}</b>;
-      },
-    },
-
   ]);
 
   // Container: Defines the grid's theme & dimensions.
@@ -227,15 +229,13 @@ function App() {
         name="typeoffood"
         id="typeoffood"
         onChange={handlePickTypeOfFood}
-        value={typeOfFood}>
+        value={typeOfFood}
+      >
         <option value=""></option>
         <option value="british">British</option>
         <option value="french">French</option>
         <option value="korean">Korean</option>
-        <option value="spanish">Spanish</option>
-        <option value="other">Other</option>
       </select>
- 
 
       <AgGridReact
         rowData={
