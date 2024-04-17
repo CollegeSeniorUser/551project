@@ -218,6 +218,7 @@ function App() {
         return <b>{rating.toFixed(2)}</b>;
       },
     },
+    { field: "Score.Num of score", headerName: 'Total votes', filter: true },
     { field: "Score.Stars", headerName: 'Stars', filter: true },
   ]);
 
