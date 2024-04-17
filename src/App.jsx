@@ -216,13 +216,7 @@ function App() {
         return <b>{rating.toFixed(2)}</b>;
       },
     },
-    {
-      field: "Num of score",
-      cellRenderer: ({ data }) => {
-        const totalVotes = data.Score.Likes + data.Score.Dislikes;
-        return <b>{totalVotes}</b>;
-      },
-    },
+
   ]);
 
   // Container: Defines the grid's theme & dimensions.
