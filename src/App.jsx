@@ -11,7 +11,7 @@ import { AgGridReact } from "@ag-grid-community/react";
 import "@ag-grid-community/styles/ag-grid.css";
 import "@ag-grid-community/styles/ag-theme-quartz.css";
 import "@ag-grid-community/styles/ag-theme-alpine.min.css";
-
+import { ref, runTransaction, get, set } from "firebase/database";
 import { ModuleRegistry } from "@ag-grid-community/core";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { saveToLocalStorage, getFromLocalStorage } from "./utils";
@@ -99,8 +99,15 @@ function App() {
   // It updates the data in the database and in the local storage
   // It also updates the state of the userData (Which is really just a helper along with the local storage)
 const onEdit = (rowData, property) => async (e) => {
-  // Determine the database based on rowData
   const db = rowData.db === "db1" ? db1 : db2;
+  const scoreRef = ref(db, `restaurants/${rowData.id}/Score`);
+
+  // Check if Score exists for the restaurant
+  const scoreSnap = await get(scoreRef);
+  if (!scoreSnap.exists()) {
+    console.error("Score record does not exist, cannot update likes/dislikes.");
+    return; // Exit if no Score record exists
+  }
 
   let updateNumScore = false; // Flag to determine if numScore needs to be updated
 
@@ -161,10 +168,11 @@ const onEdit = (rowData, property) => async (e) => {
     // Calculating new numScore
     const numScore = likes - dislikes;
 
-    // Updating numScore in Firebase
-    const numScoreRef = ref(db, `restaurants/${rowData.id}/Score/NumScore`);
+    // Correcting the reference to "Num of score" to update in Firebase
+    const numScoreRef = ref(db, `restaurants/${rowData.id}/Score/Num of score`);
     set(numScoreRef, numScore);
   }
+
 
   // Updating local storage and state
   saveToLocalStorage("data", {
