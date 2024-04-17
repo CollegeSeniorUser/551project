@@ -105,7 +105,7 @@ function App() {
     const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
     const dislikesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
     const numOfScore = ref(db, `restaurants/${rowData.id}/Score/Num of score`);
-
+    const starsRef = ref(db, `restaurants/${rowData.id}/Score/Stars`);
     if (property === "like") {
       // Get the number of likes using likesRef
 
@@ -150,6 +150,11 @@ function App() {
     runTransaction(numOfScore, (currentNumOfScore) => {
       return currentLikes + currentdisLikes;
     });
+        // Calculate stars
+    const rating = totalVotes === 0 ? 0 : (currentLikes / totalVotes) * 5;
+
+    // Update stars
+    runTransaction(starsRef, () => rating);
 
     saveToLocalStorage("data", {
       [rowData.id]: { [property]: e.target.checked },
