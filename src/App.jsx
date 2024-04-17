@@ -216,6 +216,13 @@ function App() {
         return <b>{rating.toFixed(2)}</b>;
       },
     },
+    {
+      field: "Num of score",
+      cellRenderer: ({ data }) => {
+        const totalVotes = data.Score.Likes + data.Score.Dislikes;
+        return <b>{totalVotes}</b>;
+      },
+    },
   ]);
 
   // Container: Defines the grid's theme & dimensions.
@@ -228,12 +235,13 @@ function App() {
         name="typeoffood"
         id="typeoffood"
         onChange={handlePickTypeOfFood}
-        value={typeOfFood}
-      >
+        value={typeOfFood}>
         <option value=""></option>
         <option value="british">British</option>
         <option value="french">French</option>
         <option value="korean">Korean</option>
+        <option value="spanish">Spanish</option>
+        <option value="other">Other</option>
       </select>
 
       <AgGridReact
