@@ -156,14 +156,9 @@ function App() {
     // Update stars
     runTransaction(starsRef, () => rating);
 
-    saveToLocalStorage("data", {
-      [rowData.id]: { [property]: e.target.checked },
-    });
-
-    setUserData((prev) => ({
-      ...prev,
-      [rowData.id]: { [property]: e.target.checked },
-    }));
+// Update local storage and userData state
+  saveToLocalStorage("data", { ...userData, [rowData.id]: { [property]: e.target.checked } });
+  setUserData((prev) => ({ ...prev, [rowData.id]: { [property]: e.target.checked } }));
   };
 
   // Column Definitions: Defines & controls grid columns.
