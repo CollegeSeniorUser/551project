@@ -100,12 +100,12 @@ function App() {
   // It updates the data in the database and in the local storage
   // It also updates the state of the userData (Which is really just a helper along with the local storage)
   const onEdit = (rowData, property) => async (e) => {
+    const db = rowData.db === "db1" ? db1 : db2;
     // Update realtime DB
     const likesRef = ref(db, `restaurants/${rowData.id}/Score/Likes`);
     const dislikesRef = ref(db, `restaurants/${rowData.id}/Score/Dislikes`);
     const numOfScore = ref(db, `restaurants/${rowData.id}/Score/Num of score`);
 
-    const db = rowData.db === "db1" ? db1 : db2;
     if (property === "like") {
       // Get the number of likes using likesRef
 
@@ -145,6 +145,7 @@ function App() {
     const snapshotdisLikes = await get(dislikesRef);
     const currentLikes = snapshotLikes.val() || 0;
     const currentdisLikes = snapshotdisLikes.val() || 0;
+    debugger;
 
     runTransaction(numOfScore, (currentNumOfScore) => {
       return currentLikes + currentdisLikes;
