@@ -164,6 +164,7 @@ function App() {
   // Column Definitions: Defines & controls grid columns.
   const [colDefs] = useState([
     { field: "Location", filter: true },
+
     { field: "Name", filter: true },
     { field: "Type of food", headerName: "Type of Food", filter: true },
 
@@ -217,6 +218,7 @@ function App() {
         return <b>{rating.toFixed(2)}</b>;
       },
     },
+    { field: "Stars", filter: true },
   ]);
 
   // Container: Defines the grid's theme & dimensions.
