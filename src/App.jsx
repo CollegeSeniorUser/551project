@@ -205,7 +205,7 @@ function App() {
       ),
     },
     { field: "Score.Num of score", headerName: "Total votes" },
-
+    //{ field: "Score.Stars", headerName: "Rating" },
     {
       field: "Stars",
       cellRenderer: ({ data }) => {
@@ -237,7 +237,9 @@ function App() {
         <option value="british">British</option>
         <option value="french">French</option>
         <option value="korean">Korean</option>
+        <option value="spanish">Spanish</option>
         <option value="other">Other</option>
+
       </select>
 
       <AgGridReact

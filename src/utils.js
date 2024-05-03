@@ -14,11 +14,11 @@ export function generateRandomData() {
       stars: faker.location.streetAddress(),
     },
     typeOfFood: faker.helpers.arrayElement([
-      "japanese",
-      "italian",
-      "mexican",
-      "chinese",
-      "american",
+      "british",
+      "french",
+      "korean",
+      "spanish",
+      "other",
     ]),
   };
 }
